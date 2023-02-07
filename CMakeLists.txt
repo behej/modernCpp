@@ -17,7 +17,8 @@ add_executable(initializations initializations.cpp)
 add_executable(moveSemantic moveSemantic.cpp)
 # Smart pointers: unique_ptr and shared_ptr
 add_executable(smartPointers smartPointers.cpp)
-
+# Containers
+add_executable(containers containers.cpp)
 
 add_executable(sandbox sandbox.cpp)
 # iterators.cpp
