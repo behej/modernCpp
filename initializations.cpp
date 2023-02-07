@@ -76,7 +76,7 @@ int main()
      * -No narrowing: var is directly the same type as init value
      * -Better performance: no implicit conversion will occur
      * CONS:
-     * -No completely suitable if var must be of one given type (muse use last example's syntax
+     * -No completely suitable if var must be of one given type (must use last example's syntax)
      */
 
     // Stick to same type of value provided by a funtion/class
