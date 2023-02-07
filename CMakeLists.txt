@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)         # Disables compiler specific extensions. m
 
 # Basic hello world
 add_executable(hello main.cpp)
-# New stull about constructors: default, delete, explicit, NSDMI
+# New stuff about constructors: default, delete, explicit, NSDMI
 add_executable(constructors constructors.cpp)
 # Initializatons: braces init, auto, decltype, const and constexpr
 add_executable(initializations initializations.cpp)

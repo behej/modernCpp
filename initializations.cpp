@@ -43,7 +43,7 @@ int main()
     /* Braces initilizations
      * =====================
      * Initializations can now be done using curly braces.
-     * This syntax is to be prefered since its forbids narrowing.
+     * This syntax is to be preferred since its forbids narrowing.
      */
     int a {3};
     int b = 3.5;        // Narrowing happens here: 3.5 is changed to 3 because var b is an int -> NOT GOOD
@@ -64,7 +64,7 @@ int main()
      * can be painful without bringing any interest.
      * According to CppCon, auto keyword is also interesting
      * when variable should stick to the same type of another variable
-     * of track another var.
+     * or track another var.
      */
 
     // Constants init
@@ -72,7 +72,7 @@ int main()
     auto var2 {3.};
     auto var3 {int(3)};
     /* PROS:
-     * -No unintialized var: auto without init value won't work
+     * -No uninitialized var: auto without init value won't work
      * -No narrowing: var is directly the same type as init value
      * -Better performance: no implicit conversion will occur
      * CONS:
@@ -85,7 +85,7 @@ int main()
      * -var automatically adapts to required type
      * -more robust to future changes: if myFunction evolves and changes its return type,
      *  no need to rework var and we are sure no unwanted conversion will occur
-     * -Developper will focus more on algotithm and less on syntax
+     * -Developper will focus more on algorithm and less on syntax
      * CONS:
      * -Doesn't apply if var must be of given type
      */

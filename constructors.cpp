@@ -46,7 +46,7 @@ private:
      * If one member has to be initialized differently acording to a value
      * passed as constructor parameter, it has to be initialized in the constructor
      * directly, not here. Then all parameters should be initialized in the
-     * constructor to avoid mixing ways of intializing parameters
+     * constructor to avoid mixing ways of initializing parameters
      */
     int m_a {0};
     int m_b {0};
