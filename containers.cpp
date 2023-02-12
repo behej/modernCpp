@@ -12,6 +12,77 @@
 
 using namespace std;
 
+template<typename T>
+struct is_type_container {
+  static const bool value = false;
+};
+
+template<typename T>
+struct is_type_container<std::vector<T>> {
+  static const bool value = true;
+};
+
+template<typename T>
+struct is_type_container<std::list<T>> {
+  static const bool value = true;
+};
+
+template<typename T, size_t n>
+struct is_type_container<std::array<T, n>> {
+  static const bool value = true;
+};
+
+template<typename T>
+struct is_type_container<std::deque<T>> {
+  static const bool value = true;
+};
+
+template<typename T>
+struct is_type_container<std::set<T>> {
+  static const bool value = true;
+};
+
+
+
+
+template<typename T>
+typename enable_if<is_type_container<T>::value, ostream&>::type
+operator<<(ostream& os, const T& container) {
+    os << "Size: " << container.size() << "\n";
+    os << "Items: ";
+    for (const auto item : container)
+        os << item << " ";
+    os << "\n";
+
+    return os;
+}
+
+template<typename T,typename U>
+ostream& operator<<(ostream& os, queue<T, U> container) {
+    os << "Size: " << container.size() << endl;
+    os << "Items: ";
+    while (!container.empty()) {
+        os << container.front() << " ";
+        container.pop();
+    }
+    os << endl;
+
+    return os;
+}
+
+
+template<typename K, typename V>
+ostream& operator<<(ostream& os, const map<K, V> &m) {
+    os << "Size: " << m.size() << endl;
+
+    os << "Items: ";
+    for (const auto item : m)
+        os << item.first << "=" << item.second << " ";
+    os << endl;
+    return os;
+}
+
+
 template<class T>
 void printContainer(const T& container)
 {
@@ -68,10 +139,10 @@ int main()
     // - memory is pre-allocated (there may be waste)
 
     vector<double> vec(5, 1.2);
-    printContainer(vec);
+    cout << vec;
     cout << "First item=" << vec.front() << " or " << vec[0] << endl;
     vec.resize(8, 3.3);
-    printContainer(vec);
+    cout << vec;
 
     //############################################################
     cout << endl << "-> list" << endl << endl;
@@ -83,20 +154,20 @@ int main()
     // - memory overhead (pointers to next and previous items)
 
     list<int> l(3, 2);      // Create liste of fixed size with default value
-    printContainer(l);
+    cout << l;
     l.push_back(5);         // Add item to end of list
-    printContainer(l);
+    cout << l;
     l.erase(l.begin()); // Remove list item
-    printContainer(l);
+    cout << l;
 
     //############################################################
 
     cout << endl << "-> array" << endl << endl;
 
     array<int, 3> ar;
-    printContainer(ar);
+    cout << ar;
     ar.fill(2);
-    printContainer(ar);
+    cout << ar;
 
     //############################################################
 
@@ -119,21 +190,21 @@ int main()
     q.push(1.2);
     q.push(3.3);
     q.push(5.6);
-    printContainer(q);
+    cout << q;
     q.pop();
-    printContainer(q);
+    cout << q;
 
     //############################################################
 
     cout << endl << "-> deque" << endl << endl;
 
     deque<int> dq(5, 3);
-    printContainer(dq);
+    cout << dq;
     dq.push_front(1);   // Insert before 1st item
     dq.push_back(9);    // Add at end
     dq.insert(dq.begin()+2, 4);     // Insert before 2nd position starting from beginning
     dq.insert(dq.end()-3, 7);       // Insert before 3rd position starting from the end
-    printContainer(dq);
+    cout << dq;
 
     //############################################################
 
@@ -144,7 +215,7 @@ int main()
     s.emplace(2.1);
     s.emplace(3.2);
     s.emplace(2.1);
-    printContainer(s);
+    cout << s;
 
     //############################################################
 
@@ -153,7 +224,7 @@ int main()
     map<string, int> m;
     m["foo"] = 3;
     m["bar"] = 5;
-    printContainer(m);
+    cout << m;
 
     cout << "Searching for a given key:" << endl;
     auto it {m.find("foo")};
