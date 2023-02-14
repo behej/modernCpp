@@ -99,11 +99,10 @@ struct is_type_container<std::set<T>> {
 template<typename T>
 typename std::enable_if<is_type_container<T>::value, std::ostream&>::type
 operator<<(std::ostream& os, const T& container) {
-    os << "Size: " << container.size() << std::endl;
+    os << "Size: " << container.size() << " / ";
     os << "Items: ";
     for (const auto item : container)
         os << item << " ";
-    os << std::endl;
     return os;
 }
 
@@ -115,14 +114,12 @@ operator<<(std::ostream& os, const T& container) {
  */
 template<typename T,typename U>
 std::ostream& operator<<(std::ostream& os, std::queue<T, U> container) {
-    os << "Size: " << container.size() << std::endl;
+    os << "Size: " << container.size() << " / ";
     os << "Items: ";
     while (!container.empty()) {
         os << container.front() << " ";
         container.pop();
     }
-    os << std::endl;
-
     return os;
 }
 
@@ -131,11 +128,10 @@ std::ostream& operator<<(std::ostream& os, std::queue<T, U> container) {
  */
 template<typename K, typename V>
 std::ostream& operator<<(std::ostream& os, const std::map<K, V> &m) {
-    os << "Size: " << m.size() << std::endl;
+    os << "Size: " << m.size() << " / ";
     os << "Items: ";
     for (const auto item : m)
         os << item.first << "=" << item.second << " ";
-    os << std::endl;
     return os;
 }
 
