@@ -31,9 +31,9 @@ auto myFunction2() {
 // ----
 // NOTE: in this example, decltype is not really useful because indicating the return type
 // after the arrow is not necessary anymore with C++14
-template<class T1, class T2>
+template<typename T1, typename T2>
 auto myTemplate1(T1 p1, T2 p2) -> decltype(p1 * p2) {
-    decltype(p1 * p2) result = {p1 * p2};
+    decltype(p1 * p2) result {p1 * p2};
     return result;
 }
 
@@ -116,5 +116,4 @@ int main()
     auto var9 {myTemplate1(3, 2.)};     // var9 will be float since decltype in template will return a float
     auto var10 {myTemplate1(3, 2)};     // var10 will be int since decltype in template will return a int
     // int var11 {myTemplate1(3, 2.)};  // ERROR: decltype in template will return float whereas var11 is int
-
 }

@@ -41,45 +41,105 @@ int bar() {
 class MyClass
 {
 public:
-    MyClass() : m_a(0) {
+    /**
+     * @brief Default CTor
+     * Variable are initialized
+     * Memory is allocated
+     */
+    MyClass() : m_a(0), m_ptr(new double(3.2)) {
         cout << ">> Default CTor" << endl;
     }
 
+    /**
+     * @brief Dtor
+     * Memory dynamically allocated is freed
+     */
+    ~MyClass() {
+        cout << ">> DTor" << endl;
+        if (m_ptr != nullptr)
+            delete m_ptr;
+    }
+
+    /**
+     * @brief Copy CTor
+     * @param other Object to copy
+     * Variable is initialized with same value than other
+     * Memory is allocated and initialized with same value that other
+     */
     MyClass(const MyClass& other) :
-        m_a(other.m_a)
+        m_a(other.m_a), m_ptr(new double)
     {
+        *m_ptr = *other.m_ptr;
         cout << ">> Copy CTor" << endl;
     }
 
+    /**
+     * @brief Move CTor
+     * @param other Object to move
+     * Variable is initialized with same value than other
+     * Memory reference by other is moved and now belong to this object
+     */
     MyClass(MyClass&& other) :
-        m_a(other.m_a)
+        m_a(other.m_a), m_ptr(other.m_ptr)
     {
+        other.m_ptr = nullptr;  // Other should not reference memory space anymore, since it doesn't belong to it anymore
         cout << ">> Move CTor" << endl;
     }
 
-    MyClass& operator=(const MyClass& a) {
+    /**
+     * @brief Affectation operator
+     * @param other Other object to copy
+     * Variable is set to same value than other
+     * Memory previously reference is freed
+     * Memory is then newly allocated with value of other
+     */
+    MyClass& operator=(const MyClass& other) {
         cout << ">> Assignment operator" << endl;
-        if (this != &a) {       // Check is dest different that source
-            m_a = a.m_a;
+        if (this != &other) {       // Check if dest different than source
+            m_a = other.m_a;
+            delete m_ptr;       // Old memory is freed
+            m_ptr = new double(*other.m_ptr);   // New memory is allocated, content is copied
         }
         return *this;
     }
 
-    MyClass& operator=(MyClass&& a) {
+    /**
+     * @brief Move assignment operator
+     * @param other other object to move
+     * Variable is set to same value than other
+     * Memory previously reference is freed
+     * Memory reference by other is moved and now belong to this object
+     */
+    MyClass& operator=(MyClass&& other) {
         cout << ">> Move assignment operator" << endl;
-        if (this != &a) {       // Check is dest different that source
-            m_a = a.m_a;
+        if (this != &other) {       // Check if dest different than source
+            m_a = other.m_a;
+            delete  m_ptr;      // Old memory is freed
+            m_ptr = other.m_ptr;    // Pointer now points t memory of other
+            other.m_ptr = nullptr;  // Other should not reference memory space anymore, since it doesn't belong to it anymore
         }
         return *this;
+    }
+
+    void display() {
+        if (m_ptr != nullptr) {
+            cout << "Addr: " << this << " / Val: " << m_a << endl;
+            cout << "pointer: " << m_ptr << " / Val: " << *m_ptr << endl;
+        }
+        else {
+            cout << "Object is invalid - probably moved" << endl;
+        }
     }
 
 private:
     int m_a;
+    double* m_ptr;
 };
 
 MyClass baz() {
     cout << ">> baz" << endl;
     MyClass a;
+    a.display();
     cout << ">> /baz" << endl;
     return a;
 }
@@ -110,17 +170,28 @@ int main()
 
     cout << "MyClass obj1" << endl;
     MyClass obj1;
+    obj1.display();
     cout << "MyClass obj2{obj1}" << endl;
     MyClass obj2 {obj1};
+    obj2.display();
     cout << "MyClass obj3 {move(obj1)}" << endl;
     MyClass obj3 {move(obj1)};
+    cout << "obj1:" << endl;
+    obj1.display();     // Object1 has been moved. It shouldn't be used anymore
+    cout << "obj3:" << endl;
+    obj3.display();
     cout << "/!\\ From now on, obj1 has been moved. I'm no more responsible of it and I shouldn't use it anymore" << endl;
     cout << "MyClass obj4(baz()} - baz() creating and returning an object" << endl;
     MyClass obj4 {baz()};
-    cout << "obj2 = obj1" << endl;
+    obj4.display();
+    cout << "obj5 = obj2" << endl;
     MyClass obj5;
+    obj5.display();
     obj5 = obj2;
+    obj2.display();
+    obj5.display();
     cout << "obj2 = baz()" << endl;
-    obj2 = baz();
+    obj2 = baz();   // Use of move assignment operator. Without it, compiler would use copy assignment which may be less efficient.
+    obj2.display();
 
 }
