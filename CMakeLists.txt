@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 20)            # Declare which C++ version to use. Can be
 set(CMAKE_CXX_STANDARD_REQUIRED ON)   # Requires C++ standard to be applied. CMake doesn't downgrade if no compatible compiler is found. (Default is OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)         # Disables compiler specific extensions. may stick to option -std=c++11 instead of -std=gnu++11. Recommended for broader platforms compatibility (Default is ON)
 
+find_package(Threads REQUIRED)
+
 # Basic hello world
 add_executable(hello main.cpp)
 # New stuff about constructors: default, delete, explicit, NSDMI
@@ -19,6 +21,9 @@ add_executable(moveSemantic moveSemantic.cpp)
 add_executable(smartPointers smartPointers.cpp)
 # Containers
 add_executable(containers containers.cpp metaprogramming.h)
+# Threads
+add_executable(threads threads.cpp)
+target_link_libraries(threads ${CMAKE_THREAD_LIBS_INIT})
 
 
 add_executable(sandbox sandbox.cpp)
