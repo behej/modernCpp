@@ -105,6 +105,12 @@ void fulfillPromises(std::promise<int> prom1, std::promise<int> prom2, std::prom
     prom2.set_exception(std::make_exception_ptr(std::runtime_error("Promise #2 failed")));
 }
 
+int longComputation()
+{
+    this_thread::sleep_for(1000ms);
+    return 3;
+}
+
 void incr(int& a)
 {
     a++;
@@ -192,6 +198,7 @@ int main()
     try {
         cout << "Program explicitely raises an exception through the promise. Promise is not fulfilled and exception reaches the future." << endl;
         auto val { exceptionFuture.get() };
+        NOT_USED(val);
     } catch (runtime_error e) {
         cout << "- exception future: " << e.what() << endl;
     }
@@ -199,11 +206,27 @@ int main()
     try {
         cout << "Promse is never fulfilled and destroyed. Future gets a 'broken promise' exception" << endl;
         auto val { brokenFuture.get() };
+        NOT_USED(val);
     } catch (future_error e) {
         cout << "- broken promise: " << e.what() << endl;
     }
 
-    thread_future.join();
+    thread_future.join(); // Necesary to synch with end of started thread
+    cout << endl;
+
+    cout << "Asynchronous functions" << endl;
+    cout << "======================" << endl;
+    cout << "Asynchronous functions are useful for computations that may take time." << endl;
+    cout << "There is no guarantee that it will execute in its own thread" << endl;
+    cout << "async will return its result through a 'future' object. future.get will block until method" << endl;
+    cout << "called through async returns." << endl
+         << endl;
+
+    cout << "Start long computation asynchronously" << endl;
+    auto var { std::async(longComputation) };
+    cout << "Waiting for asynchronous computation to complete to retrieve result" << endl;
+    auto val { var.get() };
+    cout << "Asynchronous computation ended. Retrieved value: " << val << endl;
 
     return 0;
 }
