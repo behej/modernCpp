@@ -1,9 +1,14 @@
 #include <chrono>
+#include <exception>
 #include <functional>
+#include <future>
 #include <iostream>
 #include <semaphore>
+#include <sstream>
 #include <thread>
 #include <type_traits>
+
+#define NOT_USED(expr) (void)(expr)
 
 using namespace std;
 
@@ -24,26 +29,33 @@ binary_semaphore exitSemaphore { 0 }; // binary semaphore is equivalent to count
 
 // Utility Functions
 //===================
+std::string threadId()
+{
+    stringstream st;
+    st << "Thread #" << std::hex << this_thread::get_id() << std::dec;
+    return st.str();
+}
+
 /// Basic method that will loop a certain number of times, each loop
 /// is only a sleep instruction.
 template <typename T>
 typename enable_if<is_duration<T>::value, void>::type
 loopSleep(T delay, int count)
 {
-    cout << "Thread #" << this_thread::get_id() << " started - will loop " << count << " times" << endl;
+    cout << threadId() << " started - will loop " << count << " times" << endl;
 
     while (count--) {
         this_thread::sleep_for(delay);
-        cout << "Thread #" << this_thread::get_id() << ": " << count << " remaining loops" << endl;
+        cout << threadId() << ": " << count << " remaining loops" << endl;
     }
 
-    cout << "Thread #" << this_thread::get_id() << " ended" << endl;
+    cout << threadId() << " ended" << endl;
 }
 
 /// Will call a function on a variable (using reference)
-template <typename T>
-typename enable_if<is_duration<T>::value, void>::type
-applyFunctionOnVar(T delay, int count, function<void(int&)> f, int& a)
+template <typename T1, typename T2>
+typename enable_if<is_duration<T1>::value, void>::type
+applyFunctionOnVar(T1 delay, int count, function<void(T2&)> f, T2& a)
 {
     while (count--) {
         f(a);
@@ -52,7 +64,7 @@ applyFunctionOnVar(T delay, int count, function<void(int&)> f, int& a)
 }
 
 /// This function releases the synchro semaphore every second during 5s
-/// Once finished, it releases the exit semaphore to indicate other thraead to exit.
+/// Once finished, it releases the exit semaphore to indicate other thread to exit.
 void postingFunc()
 {
     for (int i { 0 }; i < 5; i++) {
@@ -78,23 +90,38 @@ void waitingFunc()
     cout << "Exiting waiting thread" << endl;
 }
 
+/// Fulfills (or not) promises after 2s delay
+/// - set value for 1st promise
+/// - explicitly raise exception for 2nd promise
+/// - doesn't satisfy 3rd promise
+void fulfillPromises(std::promise<int> prom1, std::promise<int> prom2, std::promise<int> prom3)
+{
+    NOT_USED(prom3);
+
+    cout << threadId() << " Entering thread, wait for 2s" << endl;
+    std::this_thread::sleep_for(2s);
+    cout << "Fulfill promises -> end of thread" << endl;
+    prom1.set_value(42);
+    prom2.set_exception(std::make_exception_ptr(std::runtime_error("Promise #2 failed")));
+}
+
 void incr(int& a)
 {
     a++;
-    cout << "Thread #" << this_thread::get_id() << ": incr: " << a << endl;
+    cout << threadId() << ": incr: " << a << endl;
 }
 
 void decr(int& a)
 {
     a--;
-    cout << "Thread #" << this_thread::get_id() << ": decr: " << a << endl;
+    cout << threadId() << ": decr: " << a << endl;
 }
 
 // MAIN
 //======
 int main()
 {
-    cout << "Start main thread #" << this_thread::get_id() << endl;
+    cout << "Start main thread #" << std::hex << this_thread::get_id() << std::dec << endl;
 
     cout << endl;
     cout << "Basic threads: starting 2 threads that will run in parallel" << endl;
@@ -118,8 +145,8 @@ int main()
     cout << "while the other thread is using it. This can lead to inconsistencies if value changes while beeing used." << endl;
 
     int a { 0 };
-    thread thread_inc { applyFunctionOnVar<chrono::milliseconds>, 100ms, 5, incr, ref(a) };
-    thread thread_dec { applyFunctionOnVar<chrono::milliseconds>, 100ms, 5, decr, ref(a) };
+    thread thread_inc { applyFunctionOnVar<chrono::milliseconds, int>, 100ms, 5, incr, ref(a) };
+    thread thread_dec { applyFunctionOnVar<chrono::milliseconds, int>, 100ms, 5, decr, ref(a) };
     thread_inc.join();
     thread_dec.join();
     cout << endl;
@@ -135,6 +162,48 @@ int main()
     thread thread_posting { postingFunc };
     thread_waiting.join();
     thread_posting.join();
+
+    cout << endl;
+    cout << "Promises" << endl;
+    cout << "========" << endl;
+    cout << "Promise/future is a way to indicate that a value will later be made available." << endl;
+    cout << "The promise is the objet to push value when evaluated." << endl;
+    cout << "The future is the object where the value is retrieved. future.get is blocking until the promise is fulfilled." << endl
+         << endl;
+
+    // TODO diff between thread and async
+
+    std::promise<int> satisfiedPromise;
+    std::promise<int> exceptionPromise;
+    std::promise<int> brokenPromise;
+    std::future<int> satisfiedFuture { satisfiedPromise.get_future() };
+    std::future<int> exceptionFuture { exceptionPromise.get_future() };
+    std::future<int> brokenFuture { brokenPromise.get_future() };
+
+    std::thread thread_future { fulfillPromises, move(satisfiedPromise), move(exceptionPromise), move(brokenPromise) };
+
+    cout << "Thread started: waiting for futures:" << endl;
+    {
+        auto val { satisfiedFuture.get() };
+        cout << "Promise is fulfilled. Future is able to retrieve the value and unblocks" << endl;
+        cout << "- satified future -> value: " << val << endl;
+    }
+
+    try {
+        cout << "Program explicitely raises an exception through the promise. Promise is not fulfilled and exception reaches the future." << endl;
+        auto val { exceptionFuture.get() };
+    } catch (runtime_error e) {
+        cout << "- exception future: " << e.what() << endl;
+    }
+
+    try {
+        cout << "Promse is never fulfilled and destroyed. Future gets a 'broken promise' exception" << endl;
+        auto val { brokenFuture.get() };
+    } catch (future_error e) {
+        cout << "- broken promise: " << e.what() << endl;
+    }
+
+    thread_future.join();
 
     return 0;
 }
