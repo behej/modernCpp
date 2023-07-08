@@ -26,5 +26,4 @@ add_executable(threads threads.cpp)
 target_link_libraries(threads ${CMAKE_THREAD_LIBS_INIT})
 
 
-add_executable(sandbox sandbox.cpp)
 # iterators.cpp

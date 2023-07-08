@@ -151,6 +151,9 @@ int main()
     int a {0};
     constexpr int b {1};
 
+    cout << "Move semantics with variables" << endl;
+    cout << "=============================" << endl;
+
     cout << "foo(a) - 'a' being a variable" << endl;
     foo(a);         // non const int -> call of 1st definition of foo
     cout << "foo(b) - 'b' being a constexpr" << endl;
@@ -166,7 +169,9 @@ int main()
      cout << "foo(move(b))" << endl;
     foo(move(b));   // b is moved but is const -> call of 2nd definition of foo
 
-    cout << "==========" << endl;
+    cout << endl;
+    cout << "Move semantics with objects" << endl;
+    cout << "===========================" << endl;
 
     cout << "MyClass obj1" << endl;
     MyClass obj1;

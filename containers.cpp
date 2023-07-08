@@ -69,7 +69,7 @@ int main()
 
     cout << endl << "-> stack" << endl << endl;
 
-    // Stack: First in / Last ou
+    // Stack: First in / Last out
     stack<int> st;
     cout << "Stack just created. Is it empty ? " << boolalpha << st.empty() << endl;
     st.push(3);

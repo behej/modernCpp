@@ -54,9 +54,24 @@ int main()
     foo(move(A));
     cout << "Unique pointer at adress: " << A.get() << endl;
 
-
-    cout << endl << "Shared pointer" << endl;
+    cout << endl;
+    cout << "Shared pointer" << endl;
     cout << "==============" << endl;
+
+    shared_ptr<double> S2;
+    {
+        auto S1 {make_shared<double>(10.0)};
+        cout << "Shared pointer 'S1' at address " << S1.get() << " / value: " << *S1 << endl;
+        S2 = S1;
+        cout << "Shared pointer 'S2' at address " << S2.get() << " / value: " << *S2 << endl;
+        cout << S1.use_count() << " pointers refer to that memory location. Is unique ? " << boolalpha << S1.unique() << endl;
+    }
+
+    cout << endl;
+    cout << "S1 went out of scope and is therefore deleted." << endl;
+    cout << "But memory is still in use by S2, so pointer is not deleted. Use counter=" << S2.use_count() << " / unique ? " << S2.unique() << endl;
+    cout << "Memory will be released when no pointer share that same memory location" << endl;
+
 
 
 }
