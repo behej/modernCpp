@@ -21,6 +21,8 @@ add_executable(moveSemantic moveSemantic.cpp)
 add_executable(smartPointers smartPointers.cpp)
 # Containers
 add_executable(containers containers.cpp metaprogramming.h)
+# Lambdas
+add_executable(lambdas lambdas.cpp)
 # Threads
 add_executable(threads threads.cpp)
 target_link_libraries(threads ${CMAKE_THREAD_LIBS_INIT})

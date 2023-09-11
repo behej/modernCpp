@@ -32,13 +32,13 @@ int main()
     cout << ">> Move unique pointers" << endl;
     cout << "Unique pointer 'A' at adress: " << A.get() << " / value=" << *A << endl;
     cout << "Unique pointer 'B' at adress: " << B.get() << endl;
-    // *B;  // Forbidden: Memory prviously referenced by B now belongs to A. B has been set to 0.
+    // *B;  // Forbidden: Memory previously referenced by B now belongs to A. B has been set to 0.
 
     /* Note:
      * Memory space previously referenced by A is automatically freed when overwriting it with B.
      * A now references address previously referenced by B
      * B now references 0
-     * All of this happens thanks to the use of smart pointer
+     * All of this happens thanks to the use of smart pointers
      */
 
 
