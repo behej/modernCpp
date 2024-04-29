@@ -26,6 +26,8 @@ add_executable(lambdas lambdas.cpp)
 # Threads
 add_executable(threads threads.cpp)
 target_link_libraries(threads ${CMAKE_THREAD_LIBS_INIT})
+# Templates
+add_executable(templates templates.cpp)
 
 
 # iterators.cpp
